@@ -20,11 +20,11 @@ for attempt in range(18):
         time.sleep(10)
 for item in expected['files']:
     name=item['path']
-    if name in {'.nojekyll','_headers'}:continue  # deployment config, not a browser asset
+    if name in {'.nojekyll','_headers','launch/.nojekyll'}:continue  # deployment config, not a browser asset
     assert not name.startswith('/') and '..' not in name.split('/')
     data,mime=get(name)
     assert hashlib.sha256(data).hexdigest()==item['sha256'],name+' integrity mismatch'
-    if name.endswith('.mjs'):assert 'javascript' in mime,name+' is not served as JavaScript'
+    if name.endswith(('.mjs','.js')):assert 'javascript' in mime,name+' is not served as JavaScript'
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True)
     page=browser.new_page(viewport={'width':390,'height':844});errors=[];requests=[]
@@ -43,6 +43,10 @@ with sync_playwright() as p:
     expect(page.locator('#result')).to_contain_text('Signature matches the expected key')
     envelope['payload']['amount']='999';page.locator('#envelope').fill(json.dumps(envelope));page.locator('#verify').click()
     expect(page.locator('#result')).to_contain_text('INVALID')
+    page.goto(BASE+'launch/',wait_until='networkidle')
+    expect(page.get_by_text('Public testnets only.',exact=True)).to_be_visible()
+    page.locator('#connect').click()
+    expect(page.locator('#status')).to_contain_text('EIP-1193 wallet')
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     assert not errors,errors
     assert all(urllib.parse.urlsplit(url).hostname=='majedmaximus.github.io' for url in requests),requests

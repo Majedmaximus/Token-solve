@@ -1,0 +1,43 @@
+{
+  "kind": "wallet-signed-testnet-launcher",
+  "mainnetEnabled": false,
+  "privateKeysCollected": false,
+  "files": [
+    {
+      "path": "index.html",
+      "sha256": "e32beb1f3ade2675549f9fece898411521e067309327c261c2da5bbfb7120b3f"
+    },
+    {
+      "path": "app/launcher.mjs",
+      "sha256": "8ee020cc101e07a2d8f6b0035123aa522068d61f355d0bc59165ee427eb38086"
+    },
+    {
+      "path": "app/launch-core.mjs",
+      "sha256": "828de5dea99c62042a04d1415b3f81d7bdc5738d54cb4a093fb50079e0eee610"
+    },
+    {
+      "path": "vendor/ethers.min.js",
+      "sha256": "b016b0c3898c78fd8156466eb1ff1f42c9df951c2f0d64c9bdf799fe745b0a6c"
+    },
+    {
+      "path": "contracts/PrototypeToken.json",
+      "sha256": "6b207534b581f6e526114333a255f135cb762696e1f07a467235f35c28e7e1fd"
+    },
+    {
+      "path": "contracts/TokenVesting.json",
+      "sha256": "d3bdb059d19e337173b03e225bfac79acc5b672845b0da4d3295bdc1367e6380"
+    },
+    {
+      "path": "licenses/OpenZeppelin-LICENSE.txt",
+      "sha256": "20aebc68b11c063133aa2af0ef4bb29875477c6d16d715718f0daec563938b84"
+    },
+    {
+      "path": "licenses/ethers-LICENSE.md",
+      "sha256": "44eea86637405118248327fbe9d9fa95d04c7a57221c7e8c155f736db9f1b612"
+    },
+    {
+      "path": ".nojekyll",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

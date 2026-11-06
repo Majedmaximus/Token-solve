@@ -4,13 +4,13 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "3aee2298a60003dab1f22ecd318713ec0f3364202ebf47681fe0652371c3670e",
-      "bytes": 5325
+      "sha256": "8d97a70b5fe01ad75e72fa8b3abe42c0bc918cd5847e50823aa2da535eae9601",
+      "bytes": 5396
     },
     {
       "path": "privacy.html",
-      "sha256": "e842e5b7b2804fb1a40380efa8997941f5cf444f7777e275f866125543264c34",
-      "bytes": 2895
+      "sha256": "dd4ddefbf946592a323e484b03ffc6674d8694f162bd392219de312970ec92c4",
+      "bytes": 3890
     },
     {
       "path": ".nojekyll",
@@ -41,6 +41,63 @@
       "path": "app/verify.mjs",
       "sha256": "b594ed519d6a1c12e1d904f2e67408dbe3dfdba3aa433d4b9f29e7ad772c0cdb",
       "bytes": 3781
+    },
+    {
+      "path": "launch/index.html",
+      "sha256": "e32beb1f3ade2675549f9fece898411521e067309327c261c2da5bbfb7120b3f",
+      "bytes": 5745
+    },
+    {
+      "path": "launch/app/launcher.mjs",
+      "sha256": "8ee020cc101e07a2d8f6b0035123aa522068d61f355d0bc59165ee427eb38086",
+      "bytes": 7897
+    },
+    {
+      "path": "launch/app/launch-core.mjs",
+      "sha256": "828de5dea99c62042a04d1415b3f81d7bdc5738d54cb4a093fb50079e0eee610",
+      "bytes": 13486
+    },
+    {
+      "path": "launch/vendor/ethers.min.js",
+      "sha256": "b016b0c3898c78fd8156466eb1ff1f42c9df951c2f0d64c9bdf799fe745b0a6c",
+      "bytes": 522050
+    },
+    {
+      "path": "launch/contracts/PrototypeToken.json",
+      "sha256": "6b207534b581f6e526114333a255f135cb762696e1f07a467235f35c28e7e1fd",
+      "bytes": 13594
+    },
+    {
+      "path": "launch/contracts/TokenVesting.json",
+      "sha256": "d3bdb059d19e337173b03e225bfac79acc5b672845b0da4d3295bdc1367e6380",
+      "bytes": 14011
+    },
+    {
+      "path": "launch/licenses/OpenZeppelin-LICENSE.txt",
+      "sha256": "20aebc68b11c063133aa2af0ef4bb29875477c6d16d715718f0daec563938b84",
+      "bytes": 1090
+    },
+    {
+      "path": "launch/licenses/ethers-LICENSE.md",
+      "sha256": "44eea86637405118248327fbe9d9fa95d04c7a57221c7e8c155f736db9f1b612",
+      "bytes": 1075
+    },
+    {
+      "path": "launch/.nojekyll",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "launch/release-manifest.json",
+      "sha256": "26637e7f3bee109d50b7a05e6cbaf0b04f365e1d6fbd90aa1923cefcf5980255",
+      "bytes": 1339
     }
-  ]
+  ],
+  "features": {
+    "browserVerification": true,
+    "walletSignedTestnetDeployment": true,
+    "mainnetEnabled": false,
+    "serverHeldKeys": false,
+    "publicBackendConnected": false
+  }
 }
