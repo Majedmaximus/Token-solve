@@ -4,13 +4,18 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "8d97a70b5fe01ad75e72fa8b3abe42c0bc918cd5847e50823aa2da535eae9601",
-      "bytes": 5396
+      "sha256": "2400c3419b297c7809f9c353494634ef481c6b15a4dced48c97733165d5847a7",
+      "bytes": 5447
     },
     {
       "path": "privacy.html",
-      "sha256": "dd4ddefbf946592a323e484b03ffc6674d8694f162bd392219de312970ec92c4",
-      "bytes": 3890
+      "sha256": "2f7bb0a430a2338d4e4aa834bb622f8a79ed82e6575c8131542d8c26c4d17e93",
+      "bytes": 4420
+    },
+    {
+      "path": "vault.html",
+      "sha256": "969b95dc6f96c376403154b06b71606bb0dfa755b9f163e2f8bc3ab5d8c5f24d",
+      "bytes": 3159
     },
     {
       "path": ".nojekyll",
@@ -41,6 +46,16 @@
       "path": "app/verify.mjs",
       "sha256": "b594ed519d6a1c12e1d904f2e67408dbe3dfdba3aa433d4b9f29e7ad772c0cdb",
       "bytes": 3781
+    },
+    {
+      "path": "app/recovery-vault.mjs",
+      "sha256": "68e80226f3573824ff55408042ce9454d69beda0811da0f53003be1f6f7a409f",
+      "bytes": 2818
+    },
+    {
+      "path": "app/vault-ui.mjs",
+      "sha256": "19b65e9317cc7c68cd1d049ff315008e72d85e73cdd2de22004ecaff77d0cb6e",
+      "bytes": 1570
     },
     {
       "path": "launch/index.html",

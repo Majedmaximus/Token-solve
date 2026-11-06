@@ -47,6 +47,9 @@ with sync_playwright() as p:
     expect(page.get_by_text('Public testnets only.',exact=True)).to_be_visible()
     page.locator('#connect').click()
     expect(page.locator('#status')).to_contain_text('EIP-1193 wallet')
+    page.goto(BASE+'vault.html',wait_until='networkidle')
+    page.locator('#encrypt').click()
+    expect(page.locator('#status')).to_contain_text('اختر الملف')
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     assert not errors,errors
     assert all(urllib.parse.urlsplit(url).hostname=='majedmaximus.github.io' for url in requests),requests
