@@ -4,8 +4,18 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "904b9938d3d5edb8a76bdae5abe8f078b05651158e0c45219f7b14c0fc584b1a",
-      "bytes": 5264
+      "sha256": "3aee2298a60003dab1f22ecd318713ec0f3364202ebf47681fe0652371c3670e",
+      "bytes": 5325
+    },
+    {
+      "path": "privacy.html",
+      "sha256": "e842e5b7b2804fb1a40380efa8997941f5cf444f7777e275f866125543264c34",
+      "bytes": 2895
+    },
+    {
+      "path": ".nojekyll",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
     },
     {
       "path": "_headers",
@@ -14,13 +24,13 @@
     },
     {
       "path": "app/requests.mjs",
-      "sha256": "4570f95962fd288eb0037a8383c770e20bf64ff3d79efb10d88f62cddd3f8aee",
-      "bytes": 5860
+      "sha256": "7be4c43375c91ccd912adce043a5fba0d3d1fe7d9f73f32220b722715c5e5a1c",
+      "bytes": 5970
     },
     {
       "path": "app/trustbook.mjs",
-      "sha256": "e0f3dbcf946c245bf6febda690d301c4f63a7175c19d8c4a43df041eb3872a7b",
-      "bytes": 1673
+      "sha256": "b2f4f7168f54f54b4e05b79737c2abda2e07f0e46a12f8b89430bb16f25f6c21",
+      "bytes": 1760
     },
     {
       "path": "app/trustbook-ui.mjs",
@@ -29,8 +39,8 @@
     },
     {
       "path": "app/verify.mjs",
-      "sha256": "44dfb7ac5a2441a86f9f95b6b3533124fe5b7bb60eb782f0a317c5ec4e37ea57",
-      "bytes": 3026
+      "sha256": "b594ed519d6a1c12e1d904f2e67408dbe3dfdba3aa433d4b9f29e7ad772c0cdb",
+      "bytes": 3781
     }
   ]
 }

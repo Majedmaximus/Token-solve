@@ -1,8 +1,8 @@
 // Public-key pins only. Local storage is not a tamper-proof identity directory.
 export function contact(name,fingerprint){
- if(typeof name!=='string'||!name.trim()||name.trim().length>60)throw Error('Use a contact name of 1–60 characters.');
+ if(typeof name!=='string'||!name.trim()||name.trim().length>60||/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/u.test(name))throw Error('Use a contact name of 1–60 characters.');
  if(typeof fingerprint!=='string'||! /^[a-f0-9]{64}$/i.test(fingerprint.trim()))throw Error('Fingerprint must contain exactly 64 hex characters.');
- return {name:name.trim(),fingerprint:fingerprint.trim().toLowerCase()};
+ return {name:name.trim().normalize('NFC'),fingerprint:fingerprint.trim().toLowerCase()};
 }
 export function addContact(book,name,fingerprint){
  const next=contact(name,fingerprint);

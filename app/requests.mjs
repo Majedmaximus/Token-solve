@@ -9,7 +9,7 @@ function canonical(p){
  if(typeof p.asset!=='string'||!(p.asset==='native'||/^0x[0-9a-fA-F]{40}$/.test(p.asset)))throw Error('Asset must be native or an EVM token address.');
  if(typeof p.amount!=='string'||! /^(0|[1-9][0-9]{0,29})(\.[0-9]{1,18})?$/.test(p.amount)||!/[1-9]/.test(p.amount))throw Error('Enter a positive decimal amount, up to 18 decimal places.');
  if(typeof p.recipient!=='string'||!/^0x[0-9a-fA-F]{40}$/.test(p.recipient)||/^0x0{40}$/i.test(p.recipient))throw Error('Enter a nonzero EVM recipient address.');
- if(typeof p.purpose!=='string'||p.purpose.length<1||p.purpose.length>280)throw Error('Purpose must contain 1–280 characters.');
+ if(typeof p.purpose!=='string'||p.purpose.length<1||p.purpose.length>280||/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/u.test(p.purpose))throw Error('Purpose must contain 1–280 characters.');
  if(!Number.isSafeInteger(p.issuedAt)||!Number.isSafeInteger(p.expiresAt)||p.issuedAt<0||p.expiresAt<=p.issuedAt||p.expiresAt-p.issuedAt>86400000)throw Error('Invalid validity window. Maximum: 24 hours.');
  return encoder.encode(JSON.stringify(Object.fromEntries(fields.map(k=>[k,p[k]]))));
 }
@@ -23,14 +23,15 @@ export async function signRequest(identity,input,now=Date.now()){
  const signature=await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},identity.privateKey,canonical(payload));
  return {payload,publicKey:await exportPublicKey(identity.publicKey),signature:b64(signature)};
 }
-export async function verifyRequest(envelope,expectedFingerprint,now=Date.now()){
+export async function verifyRequest(envelope,expectedFingerprint,now){
  if(!envelope||Object.keys(envelope).sort().join(',')!=='payload,publicKey,signature')throw Error('Invalid signed envelope.');
  const data=canonical(envelope.payload);
  const key=await crypto.subtle.importKey('spki',unb64(envelope.publicKey,512),{name:'ECDSA',namedCurve:'P-256'},false,['verify']);
  const actualFingerprint=await fingerprint(envelope.publicKey);
  const signatureValid=await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},key,unb64(envelope.signature,256),data);
  const trusted=typeof expectedFingerprint==='string'&&/^[a-f0-9]{64}$/i.test(expectedFingerprint)&&actualFingerprint===expectedFingerprint.toLowerCase();
- const inTime=envelope.payload.issuedAt<=now&&now<envelope.payload.expiresAt;
+ const checkedAt=now??Date.now();
+ const inTime=envelope.payload.issuedAt<=checkedAt&&checkedAt<envelope.payload.expiresAt;
  return {signatureValid,trusted,inTime,verified:signatureValid&&trusted&&inTime,actualFingerprint,payload:envelope.payload};
 }
 

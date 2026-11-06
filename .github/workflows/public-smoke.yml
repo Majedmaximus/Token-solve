@@ -1,0 +1,20 @@
+name: Verify public deployment
+on:
+  push:
+    branches: [gh-pages]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install browser test tooling
+        run: |
+          python3 -m pip install playwright==1.62.0
+          python3 -m playwright install --with-deps chromium
+      - name: Test the actual published HTTPS release
+        run: python3 .github/scripts/public-smoke.py
