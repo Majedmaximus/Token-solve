@@ -1,0 +1,36 @@
+{
+  "kind": "browser-only-no-funds-pilot",
+  "version": 1,
+  "files": [
+    {
+      "path": "index.html",
+      "sha256": "904b9938d3d5edb8a76bdae5abe8f078b05651158e0c45219f7b14c0fc584b1a",
+      "bytes": 5264
+    },
+    {
+      "path": "_headers",
+      "sha256": "7cd2b6e81f693ccbc5d45d7ff3240511d57aa1b653abc3407b9dcdd4cf2c0e37",
+      "bytes": 414
+    },
+    {
+      "path": "app/requests.mjs",
+      "sha256": "4570f95962fd288eb0037a8383c770e20bf64ff3d79efb10d88f62cddd3f8aee",
+      "bytes": 5860
+    },
+    {
+      "path": "app/trustbook.mjs",
+      "sha256": "e0f3dbcf946c245bf6febda690d301c4f63a7175c19d8c4a43df041eb3872a7b",
+      "bytes": 1673
+    },
+    {
+      "path": "app/trustbook-ui.mjs",
+      "sha256": "d6fbe41d8482ed4f7c697ff39715c1ce94fb3966b193186106205be3919b7bfe",
+      "bytes": 4813
+    },
+    {
+      "path": "app/verify.mjs",
+      "sha256": "44dfb7ac5a2441a86f9f95b6b3533124fe5b7bb60eb782f0a317c5ec4e37ea57",
+      "bytes": 3026
+    }
+  ]
+}
