@@ -4,8 +4,8 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "2400c3419b297c7809f9c353494634ef481c6b15a4dced48c97733165d5847a7",
-      "bytes": 5447
+      "sha256": "b88e1c7fcf8c964024ae43da61c39a8558554409137e2df4f274a266a138bc96",
+      "bytes": 5801
     },
     {
       "path": "privacy.html",
@@ -44,8 +44,8 @@
     },
     {
       "path": "app/verify.mjs",
-      "sha256": "b594ed519d6a1c12e1d904f2e67408dbe3dfdba3aa433d4b9f29e7ad772c0cdb",
-      "bytes": 3781
+      "sha256": "97e227061061faab14a06033903d903e6d9b04f906e776f84da5192ad116c570",
+      "bytes": 5028
     },
     {
       "path": "app/recovery-vault.mjs",

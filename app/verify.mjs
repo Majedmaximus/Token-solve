@@ -1,8 +1,8 @@
 import {mountTrustbook} from './trustbook-ui.mjs';
 import {createIdentity,exportPublicKey,fingerprint,signRequest,verifyRequest,signRevocation} from './requests.mjs';
 const $=id=>document.getElementById(id);let identity,lastSigned;
-$('identity').onclick=async()=>{try{if(!crypto.subtle)throw Error('Use HTTPS or a localhost server for Web Crypto.');identity=await createIdentity();const f=await fingerprint(await exportPublicKey(identity.publicKey));$('fingerprint').replaceChildren();const code=document.createElement('code');code.textContent=f;$('fingerprint').append(code);$('sign').disabled=false;$('signed').value='';lastSigned=undefined;$('create-status').textContent='Temporary identity ready. Share its fingerprint through a separately trusted channel.';}catch(e){$('create-status').textContent=e.message;}};
-$('create').onsubmit=async e=>{e.preventDefault();$('signed').value='';$('sign').disabled=true;try{if(!identity)throw Error('Generate an identity first.');const f=e.currentTarget.elements;const r=await signRequest(identity,{chainId:f.chain.value.trim(),asset:f.asset.value.trim(),amount:f.amount.value.trim(),recipient:f.recipient.value.trim(),purpose:f.purpose.value.trim()});lastSigned=r;$('signed').value=JSON.stringify(r,null,2);$('create-status').textContent='Request signed. No payment was made.';}catch(err){$('create-status').textContent=err.message;}finally{$('sign').disabled=!identity;}};
+$('identity').onclick=async()=>{try{if(!crypto.subtle)throw Error('Use HTTPS or a localhost server for Web Crypto.');identity=await createIdentity();const f=await fingerprint(await exportPublicKey(identity.publicKey));$('fingerprint').replaceChildren();const code=document.createElement('code');code.textContent=f;$('fingerprint').append(code);$('sign').disabled=false;$('signed').value='';$('download-request').disabled=true;lastSigned=undefined;$('create-status').textContent='Temporary identity ready. Share its fingerprint through a separately trusted channel.';}catch(e){$('create-status').textContent=e.message;}};
+$('create').onsubmit=async e=>{e.preventDefault();$('signed').value='';$('download-request').disabled=true;$('sign').disabled=true;try{if(!identity)throw Error('Generate an identity first.');const f=e.currentTarget.elements;const r=await signRequest(identity,{chainId:f.chain.value.trim(),asset:f.asset.value.trim(),amount:f.amount.value.trim(),recipient:f.recipient.value.trim(),purpose:f.purpose.value.trim()});lastSigned=r;$('signed').value=JSON.stringify(r,null,2);$('download-request').disabled=false;$('create-status').textContent='Request signed. No payment was made.';}catch(err){$('create-status').textContent=err.message;}finally{$('sign').disabled=!identity;}};
 let revision=0,expiryTimer,verifiedExpiry;
 function invalidate(message='Input changed. Verify again.'){
  revision++;clearTimeout(expiryTimer);verifiedExpiry=undefined;
@@ -31,4 +31,26 @@ mountTrustbook(document.getElementById('trustbook'),$('expected'),()=>invalidate
 for(const id of ['envelope','expected'])$(id).addEventListener('input',()=>invalidate());
 window.addEventListener('focus',expireIfNeeded);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)expireIfNeeded();});
+
+$('download-request').onclick=()=>{
+ if(!$('signed').value)return;
+ const url=URL.createObjectURL(new Blob([$('signed').value],{type:'application/json'}));
+ const link=document.createElement('a');link.href=url;link.download='TRACE-signed-request.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+$('import-request').onchange=async()=>{
+ invalidate('Loading request file…');const version=revision;
+ $('envelope').value='';const file=$('import-request').files?.[0];
+ try{
+  if(!file)throw Error('No request file selected.');
+  if(file.size>12000)throw Error('Request file exceeds 12 KB.');
+  const text=await file.text();
+  if(version!==revision)return;
+  if(text.length>12000)throw Error('Request file too large.');
+  const parsed=JSON.parse(text);
+  if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))throw Error('Expected a signed request JSON object.');
+  $('envelope').value=text;
+  invalidate('Request imported. Check the signature against your independently trusted fingerprint.');
+ }catch(e){if(version===revision)invalidate('Import rejected: '+e.message);}
+ finally{$('import-request').value='';}
+};
 
