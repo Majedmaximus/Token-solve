@@ -1,5 +1,5 @@
 """Post-deployment check for the public frontend only. No secrets or private source."""
-import hashlib,json,os,time,urllib.request,urllib.parse
+import hashlib,json,os,time,tempfile,urllib.request,urllib.parse
 from pathlib import Path
 from playwright.sync_api import sync_playwright,expect
 BASE='https://majedmaximus.github.io/Token-solve/'
@@ -41,6 +41,35 @@ with sync_playwright() as p:
     envelope=json.loads(page.locator('#signed').input_value())
     page.locator('#expected').fill(fp);page.locator('#envelope').fill(json.dumps(envelope));page.locator('#verify').click()
     expect(page.locator('#result')).to_contain_text('Signature matches the expected key')
+    with tempfile.TemporaryDirectory() as temporary:
+        with page.expect_download() as download:
+            page.locator('#download-request').click()
+        exported=Path(temporary)/'signed-request.json'
+        download.value.save_as(exported)
+        recipient=browser.new_context(viewport={'width':390,'height':844}).new_page()
+        recipient.on('pageerror',lambda error:errors.append(str(error)))
+        recipient.on('request',lambda request:requests.append(request.url))
+        recipient.goto(BASE,wait_until='networkidle')
+        recipient.locator('#expected').fill(fp)
+        recipient.locator('#import-request').set_input_files(exported)
+        expect(recipient.locator('#result')).to_contain_text('Request imported')
+        expect(recipient.locator('#expected')).to_have_value(fp)
+        recipient.locator('#verify').click()
+        expect(recipient.locator('#result')).to_contain_text('Signature matches the expected key')
+        changed=json.loads(exported.read_text());changed['payload']['amount']='999'
+        exported.write_text(json.dumps(changed))
+        recipient.locator('#import-request').set_input_files(exported)
+        expect(recipient.locator('#details')).to_have_text('')
+        recipient.locator('#verify').click()
+        expect(recipient.locator('#result')).to_contain_text('INVALID')
+        recipient.locator('#import-request').set_input_files({'name':'large.json','mimeType':'application/json','buffer':b'x'*12001})
+        expect(recipient.locator('#result')).to_contain_text('exceeds 12 KB')
+        expect(recipient.locator('#envelope')).to_have_value('')
+        expect(recipient.locator('#expected')).to_have_value(fp)
+        recipient.locator('#import-request').set_input_files({'name':'invalid.json','mimeType':'application/json','buffer':b'<script>invalid</script>'})
+        expect(recipient.locator('#result')).to_contain_text('Import rejected')
+        assert recipient.evaluate('document.documentElement.scrollWidth <= innerWidth')
+        recipient.context.close()
     envelope['payload']['amount']='999';page.locator('#envelope').fill(json.dumps(envelope));page.locator('#verify').click()
     expect(page.locator('#result')).to_contain_text('INVALID')
     page.goto(BASE+'launch/',wait_until='networkidle')
@@ -55,4 +84,8 @@ with sync_playwright() as p:
     assert all(urllib.parse.urlsplit(url).hostname=='majedmaximus.github.io' for url in requests),requests
     assert not any('/api/' in url for url in requests)
     browser.close()
+summary='PASS: exported signed request imported and verified in an isolated browser; tampered, oversized and invalid files rejected; trusted fingerprint preserved. No payments or wallet transactions.'
+if os.environ.get('GITHUB_STEP_SUMMARY'):
+    with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as report:report.write(summary+'\n')
+print(summary)
 print('PASS: actual HTTPS deployment matches release hashes; browser signing, tamper rejection, module MIME and mobile layout verified. No funds used.')
