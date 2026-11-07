@@ -4,8 +4,8 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "b88e1c7fcf8c964024ae43da61c39a8558554409137e2df4f274a266a138bc96",
-      "bytes": 5801
+      "sha256": "7af86984cf5a16b172113a49828c9128324bf84370580efd1c36145d9a63ed10",
+      "bytes": 6511
     },
     {
       "path": "privacy.html",
@@ -28,9 +28,14 @@
       "bytes": 414
     },
     {
+      "path": "app/networks.mjs",
+      "sha256": "69842ebfc2ea1250897c8cae188e1782f6b18040740e69c0972897d72153351d",
+      "bytes": 3452
+    },
+    {
       "path": "app/requests.mjs",
-      "sha256": "7be4c43375c91ccd912adce043a5fba0d3d1fe7d9f73f32220b722715c5e5a1c",
-      "bytes": 5970
+      "sha256": "26d13a1fd4eca86d43f2edaef6d3acd5eaad93329f8e91ecf6a8eca6c9731aa3",
+      "bytes": 6325
     },
     {
       "path": "app/trustbook.mjs",
@@ -44,8 +49,8 @@
     },
     {
       "path": "app/verify.mjs",
-      "sha256": "97e227061061faab14a06033903d903e6d9b04f906e776f84da5192ad116c570",
-      "bytes": 5028
+      "sha256": "c3fb9d120a2d604f1e47e76c1a2e2476c24dda4e8e64271302d5070880a6a071",
+      "bytes": 7653
     },
     {
       "path": "app/recovery-vault.mjs",

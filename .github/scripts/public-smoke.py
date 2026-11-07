@@ -72,6 +72,29 @@ with sync_playwright() as p:
         recipient.context.close()
     envelope['payload']['amount']='999';page.locator('#envelope').fill(json.dumps(envelope));page.locator('#verify').click()
     expect(page.locator('#result')).to_contain_text('INVALID')
+    for network,address,label in [('tron:mainnet','TJRabPrwbZy45sbavfcjinPJC18kjpRTv8','USDT · TRC20'),('solana:mainnet','So11111111111111111111111111111111111111112','Solana Mainnet / SOL')]:
+        page.locator('#network').select_option(network)
+        page.locator('#recipient').fill(address)
+        page.locator('#amount').fill('12.34')
+        page.locator('#sign').click()
+        expect(page.locator('#download-request')).to_be_enabled()
+        signed=json.loads(page.locator('#signed').input_value())
+        assert signed['payload']['chainId']==network
+        if network=='tron:mainnet':assert signed['payload']['asset']=='TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'
+        page.locator('#envelope').fill(json.dumps(signed));page.locator('#verify').click()
+        expect(page.locator('#result')).to_contain_text('Signature matches the expected key')
+        expect(page.locator('#details')).to_contain_text(label)
+        signed['payload']['chainId']='tron:shasta' if network.startswith('tron') else 'solana:devnet'
+        page.locator('#envelope').fill(json.dumps(signed));page.locator('#verify').click()
+        expect(page.locator('#result')).to_contain_text('Not verified')
+        page.locator('#amount').fill('1');expect(page.locator('#download-request')).to_be_disabled()
+    page.locator('#network').select_option('tron:mainnet')
+    page.locator('#recipient').fill('TJRabPrwbZy45sbavfcjinPJC18kjpRTv9');page.locator('#sign').click()
+    expect(page.locator('#create-status')).to_contain_text('checksum')
+    page.locator('#recipient').fill('TJRabPrwbZy45sbavfcjinPJC18kjpRTv8')
+    page.locator('#amount').fill('1.1234567');page.locator('#sign').click()
+    expect(page.locator('#create-status')).to_contain_text('6 decimal')
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
     page.goto(BASE+'launch/',wait_until='networkidle')
     expect(page.get_by_text('Public testnets only.',exact=True)).to_be_visible()
     page.locator('#connect').click()
@@ -84,7 +107,7 @@ with sync_playwright() as p:
     assert all(urllib.parse.urlsplit(url).hostname=='majedmaximus.github.io' for url in requests),requests
     assert not any('/api/' in url for url in requests)
     browser.close()
-summary='PASS: exported signed request imported and verified in an isolated browser; tampered, oversized and invalid files rejected; trusted fingerprint preserved. No payments or wallet transactions.'
+summary='PASS: TRON USDT and Solana instructions verified; network substitution, TRON checksum and USDT precision checks passed. Exported signed request imported and verified in an isolated browser; tampered, oversized and invalid files rejected; trusted fingerprint preserved. No payments or wallet transactions.'
 if os.environ.get('GITHUB_STEP_SUMMARY'):
     with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as report:report.write(summary+'\n')
 print(summary)

@@ -1,16 +1,21 @@
+import {validateNetworkFields} from './networks.mjs';
 // Browser/Node Web Crypto only. No blockchain transaction or external service.
 const domain='trace-payment-request/v1';
 const fields=['domain','id','chainId','asset','amount','recipient','purpose','issuedAt','expiresAt'];
 const encoder=new TextEncoder();
-function canonical(p){
+async function canonical(p){
  if(!p||typeof p!=='object'||Object.keys(p).length!==fields.length||!fields.every(k=>Object.hasOwn(p,k)))throw Error('Unexpected request fields.');
- if(p.domain!==domain||typeof p.id!=='string'||!/^[-a-zA-Z0-9]{16,80}$/.test(p.id))throw Error('Invalid request identity.');
- if(typeof p.chainId!=='string'||! /^[1-9][0-9]{0,9}$/.test(p.chainId))throw Error('Invalid chain ID.');
- if(typeof p.asset!=='string'||!(p.asset==='native'||/^0x[0-9a-fA-F]{40}$/.test(p.asset)))throw Error('Asset must be native or an EVM token address.');
+ if(![domain,'trace-payment-request/v2'].includes(p.domain)||typeof p.id!=='string'||!/^[-a-zA-Z0-9]{16,80}$/.test(p.id))throw Error('Invalid request identity.');
+ if(typeof p.chainId!=='string')throw Error('Invalid chain ID.');
+ if(p.domain===domain){
+  if(!/^[1-9][0-9]{0,9}$/.test(p.chainId))throw Error('Invalid EVM chain ID.');
+  if(typeof p.asset!=='string'||!(p.asset==='native'||/^0x[0-9a-fA-F]{40}$/.test(p.asset)))throw Error('Asset must be native or an EVM token address.');
+  if(typeof p.recipient!=='string'||!/^0x[0-9a-fA-F]{40}$/.test(p.recipient)||/^0x0{40}$/i.test(p.recipient))throw Error('Enter a nonzero EVM recipient address.');
+ }
  if(typeof p.amount!=='string'||! /^(0|[1-9][0-9]{0,29})(\.[0-9]{1,18})?$/.test(p.amount)||!/[1-9]/.test(p.amount))throw Error('Enter a positive decimal amount, up to 18 decimal places.');
- if(typeof p.recipient!=='string'||!/^0x[0-9a-fA-F]{40}$/.test(p.recipient)||/^0x0{40}$/i.test(p.recipient))throw Error('Enter a nonzero EVM recipient address.');
  if(typeof p.purpose!=='string'||p.purpose.length<1||p.purpose.length>280||/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/u.test(p.purpose))throw Error('Purpose must contain 1–280 characters.');
  if(!Number.isSafeInteger(p.issuedAt)||!Number.isSafeInteger(p.expiresAt)||p.issuedAt<0||p.expiresAt<=p.issuedAt||p.expiresAt-p.issuedAt>86400000)throw Error('Invalid validity window. Maximum: 24 hours.');
+ if(p.domain==='trace-payment-request/v2')await validateNetworkFields(p);
  return encoder.encode(JSON.stringify(Object.fromEntries(fields.map(k=>[k,p[k]]))));
 }
 function b64(bytes){return btoa(String.fromCharCode(...new Uint8Array(bytes)));}
@@ -19,13 +24,13 @@ export async function createIdentity(){return crypto.subtle.generateKey({name:'E
 export async function exportPublicKey(key){return b64(await crypto.subtle.exportKey('spki',key));}
 export async function fingerprint(publicKey){const bytes=unb64(publicKey,512);const hash=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(hash)].map(v=>v.toString(16).padStart(2,'0')).join('');}
 export async function signRequest(identity,input,now=Date.now()){
- const payload={domain,id:crypto.randomUUID(),chainId:input.chainId,asset:input.asset,amount:input.amount,recipient:input.recipient,purpose:input.purpose,issuedAt:now,expiresAt:now+15*60*1000};
- const signature=await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},identity.privateKey,canonical(payload));
+ const payload={domain:typeof input.chainId==='string'&&input.chainId.includes(':')?'trace-payment-request/v2':domain,id:crypto.randomUUID(),chainId:input.chainId,asset:input.asset,amount:input.amount,recipient:input.recipient,purpose:input.purpose,issuedAt:now,expiresAt:now+15*60*1000};
+ const signature=await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},identity.privateKey,await canonical(payload));
  return {payload,publicKey:await exportPublicKey(identity.publicKey),signature:b64(signature)};
 }
 export async function verifyRequest(envelope,expectedFingerprint,now){
  if(!envelope||Object.keys(envelope).sort().join(',')!=='payload,publicKey,signature')throw Error('Invalid signed envelope.');
- const data=canonical(envelope.payload);
+ const data=await canonical(envelope.payload);
  const key=await crypto.subtle.importKey('spki',unb64(envelope.publicKey,512),{name:'ECDSA',namedCurve:'P-256'},false,['verify']);
  const actualFingerprint=await fingerprint(envelope.publicKey);
  const signatureValid=await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},key,unb64(envelope.signature,256),data);
@@ -36,7 +41,7 @@ export async function verifyRequest(envelope,expectedFingerprint,now){
 }
 
 export async function requestDigest(envelope){
- const digest=await crypto.subtle.digest('SHA-256',canonical(envelope.payload));
+ const digest=await crypto.subtle.digest('SHA-256',await canonical(envelope.payload));
  return [...new Uint8Array(digest)].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 function revocationBytes(p){
